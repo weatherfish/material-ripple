@@ -596,9 +596,9 @@ public class MaterialRippleLayout extends FrameLayout {
         enableClipPathSupportIfNecessary();
     }
 
-    public void setDefaultRippleAlpha(int alpha) {
-        this.rippleAlpha = alpha;
-        paint.setAlpha(alpha);
+    public void setDefaultRippleAlpha(float alpha) {
+        this.rippleAlpha = (int) (255 * alpha);
+        paint.setAlpha(rippleAlpha);
         invalidate();
     }
 
@@ -639,7 +639,10 @@ public class MaterialRippleLayout extends FrameLayout {
 
             // if parent is an AdapterView, try to call its ItemClickListener
             if (getParent() instanceof AdapterView) {
-                clickAdapterView((AdapterView) getParent());
+                // try clicking direct child first
+                if (!childView.performClick())
+                    // if it did not handle it dispatch to adapterView
+                    clickAdapterView((AdapterView) getParent());
             } else if (rippleInAdapter) {
                 // find adapter view
                 clickAdapterView(findParentAdapterView());
@@ -737,7 +740,7 @@ public class MaterialRippleLayout extends FrameLayout {
         }
 
         public RippleBuilder rippleAlpha(float alpha) {
-            this.rippleAlpha = 255 * alpha;
+            this.rippleAlpha = alpha;
             return this;
         }
 
@@ -774,7 +777,7 @@ public class MaterialRippleLayout extends FrameLayout {
         public MaterialRippleLayout create() {
             MaterialRippleLayout layout = new MaterialRippleLayout(context);
             layout.setRippleColor(rippleColor);
-            layout.setDefaultRippleAlpha((int) rippleAlpha);
+            layout.setDefaultRippleAlpha(rippleAlpha);
             layout.setRippleDelayClick(rippleDelayClick);
             layout.setRippleDiameter((int) dpToPx(context.getResources(), rippleDiameter));
             layout.setRippleDuration(rippleDuration);
